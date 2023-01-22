@@ -31,7 +31,13 @@ trait SendGrid
      */
     private function mailDriver()
     {
-        return function_exists('config') ? config('mail.default', config('mail.driver')) : env('MAIL_MAILER', env('MAIL_DRIVER'));
+        if (!empty($this->mailer)) {
+            return $this->mailer;
+        }
+        if (function_exists('config')) {
+            return config('mail.default', config('mail.driver'));
+        }
+        return env('MAIL_MAILER', env('MAIL_DRIVER'));
     }
 
     /**
