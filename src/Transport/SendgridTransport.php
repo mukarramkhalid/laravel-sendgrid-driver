@@ -87,9 +87,13 @@ class SendgridTransport extends AbstractTransport implements Stringable
 
         $response = $this->post($payload);
 
+        $messageId = $response->getHeaderLine('X-Message-Id');
+
+        $message->setMessageId($messageId);
+
         $message->getOriginalMessage()
             ->getHeaders()
-            ->addTextHeader('X-Sendgrid-Message-Id', $response->getHeaderLine('X-Message-Id'));
+            ->addTextHeader('X-Sendgrid-Message-Id', $messageId);
     }
 
     /**
@@ -201,7 +205,7 @@ class SendgridTransport extends AbstractTransport implements Stringable
                 'content' => base64_encode($attachment->getBody()),
                 'filename' => $this->getAttachmentName($attachment),
                 'type' => $this->getAttachmentContentType($attachment),
-                'disposition' => $attachment->getPreparedHeaders()->getHeaderParameter('Parameterized', 'Content-Disposition'),
+                'disposition' => $attachment->getDisposition(),
                 'content_id' => $attachment->getContentId(),
             ];
         }
